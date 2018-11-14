@@ -1,0 +1,537 @@
+---
+title: "The 'Epidemiological Report' Package"
+author: "European Centre for Disease Prevention and Control (ECDC)"
+output: 
+  rmarkdown::html_vignette:
+    toc: yes
+vignette: >
+  %\VignetteIndexEntry{The 'Epidemiological Report' Package}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+<style>
+  .myTable td {
+    width: 400px;
+  }
+</style>
+
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+
+## Description
+
+The EpiReport package allows the user to draft an epidemiological report similar to the ECDC Annual Epidemiological Report (AER) 
+(see https://ecdc.europa.eu/en/annual-epidemiological-reports) in Microsoft Word format for a given disease.
+
+Through standalone functions, the package is specifically designed to generate
+each disease-specific output presented in these reports, using ECDC Atlas export data. 
+
+
+Package details below:
+
+```{r, echo = FALSE}
+pkgVersion <- packageDescription("EpiReport")$Version
+pkgDate <- packageDescription("EpiReport")$Date
+authorsString <- gsub("^ *|(?<= ) |\n| *$", "", 
+                      packageDescription("EpiReport")$Authors, perl = TRUE)
+authorList <- eval(parse(text = authorsString))
+pkgAuthors <- paste(format(authorList, 
+                           include = c("given", "family", "email", "comment"), 
+                           braces = list(email = c("<", ">,<br />"), comment = c("", ""))), 
+                    collapse = "<br /><br />")
+pkgMaintainer <- packageDescription("EpiReport")$Maintainer
+pkgLicense <- packageDescription("EpiReport")$License
+pkgUrl <- packageDescription("EpiReport")$URL
+```
+
+
+Package   | Description     
+--------- | ----------------
+Version | `r pkgVersion`
+Published | `r pkgDate`
+Authors | `r pkgAuthors`
+Maintainer | `r pkgMaintainer`
+License | `r pkgLicense`
+Link to the ECDC AER reports | `r pkgUrl`
+
+
+
+
+## Background
+
+ECDC's annual epidemiological report is available as a series of individual 
+epidemiological disease reports. Reports are published on the ECDC website 
+https://ecdc.europa.eu/en/annual-epidemiological-reports as they become available.
+
+The year given in the title of the report (i.e. 'Annual epidemiological report for 2016') 
+refers to the year the data were collected. Reports are usually available for publication 
+one year after data collection is complete.
+
+All reports are based on data collected through The European Surveillance System (TESSy)[^1]
+and exported from the ECDC Atlas. 
+Countries participating in disease surveillance submit their data electronically.
+
+The communicable diseases and related health issues covered by the reports 
+are under European Union and European Economic Area disease surveillance[^2] [^3] [^4] [^5]. 
+
+ECDC's annual surveillance reports provide a wealth of epidemiological data 
+to support decision-making at the national level. 
+They are mainly intended for public health professionals and policymakers 
+involved in disease prevention and control programmes.
+
+[^1]: The European Surveillance System (TESSy) is a system for the collection, 
+analysis and dissemination of data on communicable diseases. 
+EU Member States and EEA countries contribute to the system 
+by uploading their infectious disease surveillance data at regular intervals.
+
+[^2]: 2000/96/EC: Commission Decision of 22 December 1999 
+on the communicable diseases to be progressively covered 
+by the Community network under Decision No 2119/98/EC of the European Parliament 
+and of the Council. Official Journal, OJ L 28, 03.02.2000, p. 50-53.
+
+[^3]: 2003/534/EC: Commission Decision of 17 July 2003 amending Decision No 2119/98/EC 
+of the European Parliament and of the Council and Decision 2000/96/EC 
+as regards communicable diseases listed in those decisions and amending 
+Decision 2002/253/EC as regards the case definitions for communicable diseases. 
+Official Journal, OJ L 184, 23.07.2003, p. 35-39.
+
+[^4]: 2007/875/EC: Commission Decision of 18 December 2007 amending Decision 
+No 2119/98/EC of the European Parliament and of the Council and Decision 2000/96/EC 
+as regards communicable diseases listed in those decisions. Official Journal, OJ L 344, 28.12.2007, p. 48-49.
+
+[^5]: Commission Decision 2119/98/EC of the Parliament and of the Council of 24 September 1998 
+setting up a network for the epidemiological surveillance and control of 
+communicable diseases in the Community. Official Journal, OJ L 268, 03/10/1998 p. 1-7.
+
+
+## 1. Datasets to be used in the Epidemiological Report package
+
+### 1.1. Disease dataset specification
+
+Two types of datasets can be used:
+
+* The default dataset included in the `EpiReport` package which includes 
+Salmonellosis data for 2012-2016: `EpiReport::SALM2016`;
+* Any dataset specified as described below.
+
+Description of each variable required in the disease dataset (naming and format):
+
+* `HealthTopicCode`: Character string, disease code 
+(see also the reports parameter table Tab.3);
+* `MeasurePopulation`: Character string, population characteristics 
+(e.g. All cases,  Confirmed cases, Serotype AGONA, Serotype BAREILLY etc.). 
+* `MeasureCode`: Character string, code of the indicators available 
+(e.g. ALL.COUNT, ALL.RATE, CONFIRMED.AGESTANDARDISED.RATE etc.);
+* `TimeUnit`: Character string, unit of the time variable `TimeCode` 
+(e.g. `M` for monthly data, `Y` for yearly data). 
+* `TimeCode`: Character string, time variable including dates in any formats available 
+i.e. yearly data (e.g. 2001) or monthly data (e.g. 2001-01);
+* `GeoCode`: Character string, geographical level in coded format 
+(e.g. `AT` for Austria, `BE` for Belgium, `BG` for Bulgaria, 
+see also the `EpiReport::MSCode` table, correspondence table for Member State labels and codes);
+* `XLabel`: The label associated with the x-axis in the epidemiological report
+(see `getAgeGender()` and `plotAgeGender()` bar graph for the age variable);
+* `YLabel`: The label associated with the y-axis in the epidemiological report
+(see `getAgeGender()` and `plotAgeGender()` bar graph for the grouping variable gender);
+* `ZValue`: The value associated with the stratification of `XLabel` and `YLabel` 
+in the age and gender bar graph (see `getAgeGender()` and `plotAgeGender()`);
+* `YValue`: The value associated with the y-axis in the epidemiological report
+(see `plotAge` bar graph for the variable age, or `getTableByMS()` for the number of cases, 
+rate or age-standardised rate in the table by Member States by year);
+* `N`: Integer, number of cases (see `getTrend()` and `getSeason()` line graph).
+
+
+```{r, echo=FALSE, results='asis'}
+my_dataset <- EpiReport::SALM2016
+my_dataset <- dplyr::select(my_dataset, 
+                            c("HealthTopicCode", "MeasurePopulation", "MeasureCode",
+                              "TimeUnit", "TimeCode", "GeoCode", "XLabel",
+                              "YLabel", "ZValue", "YValue", "N"))
+knitr::kable(my_dataset[sample(1:nrow(EpiReport::SALM2016), 10), ], 
+             row.names = FALSE,
+             format = "html", table.attr = 'class="myTable"',
+             caption = "__Tab.1 Example of Salmonellosis data 2012-2016__")
+```
+
+
+
+### 1.2. Report parameters dataset specification
+
+The internal dataset `EpiReport::AERparams` describes the parameters to be used 
+for each output of each disease report.
+
+If the user wishes to set different parameters for one of the 53 covered health topics, 
+or if the user wishes to analyse an additional disease not covered by the default 
+parameter table, it is possible to use an external dataset as long as it is 
+specified as described below and in the help page `?EpiReport::AERparams`.
+All functions of the `EpiReport` package can then be fed with this specific parameter table.
+
+List of the main parameters included:
+
+* `HealthTopic`: Character string, disease code that should match 
+with the health topic code from the disease-specific dataset (see Tab.1)
+* `MeasurePopulation`: Character string, population to present in the report: 
+either `ALL` cases or `CONFIRMED` cases only.
+* `TableUse`: Character string, specifying whether to include the table in the epidemiological report and which table to include:
+    + `NO`: No table included
+    + `COUNT`: Table presenting the __number of cases__ by Member State by year
+    + `RATE`: Table presenting the __rates__ of cases by Member State by year
+    + `ASR`: Table presenting the __age-standardised__ rates of cases 
+    by Member State by year
+* `AgeGenderUse`: Character string, specifying whether to include the age and gender
+bar graph in the epidemiological report and which type of graph to include:
+    + `NO`: No graph included
+    + `AG-COUNT`: Bar graph presenting the __number of cases__ by age and gender
+    + `AG-RATE`: Bar graph presenting the __rates__ of cases by age and gender
+    + `AG-PROP`: Bar graph presenting the __proportion__ of cases by age and gender
+    + `A-RATE`: Bar graph presenting the __rates__ of cases by age
+* `TSTrendGraphUse`: Yes/No, specifying whether to include a line graph describing 
+the trend of the disease over the time.
+* `TSSeasonalityGraphUse`: Yes/No, specifying whether to include a line graph
+describing the seasonality of the disease.
+* `MapNumbersUse`: Yes/No, specifying whether to include the map presenting 
+the __number of cases__ by Member State.
+* `MapRatesUse`: Yes/No, specifying whether to include the map presenting 
+the __rates__ of cases by Member State.
+* `MapASRUse`: Yes/No, specifying whether to include the map presenting 
+the __age-standardised rates__ of cases by Member State.
+
+
+
+```{r, echo=FALSE, results='asis'}
+my_dataset <- EpiReport::AERparams
+my_dataset <- dplyr::select(my_dataset, 
+                            c("HealthTopic", "MeasurePopulation",
+                              "TableUse", "AgeGenderUse",
+                              "TSTrendGraphUse", "TSSeasonalityGraphUse",
+                              "MapNumbersUse", "MapRatesUse", "MapASRUse"))
+knitr::kable(my_dataset[sample(1:nrow(EpiReport::AERparams), 5), ], 
+             row.names = FALSE,
+             format = "html", table.attr = 'class="myTable"',
+             caption = "__Tab.2 Example of the main columns of the parameter dataset__")
+```
+
+
+
+### 1.3. Member States correspondence table dataset
+
+The internal dataset `EpiReport::MSCode` provides the correspondence table 
+of the geographical code `GeoCode` used in the disease dataset, 
+and the geographical label `Country` to use throughout the report. 
+Additional information on the EU/EEA affiliation is also available in column `EUEEA`.
+
+
+```{r, echo=FALSE, results='asis'}
+my_dataset <- EpiReport::MSCode
+knitr::kable(my_dataset[sample(1:nrow(EpiReport::MSCode), 5), ], 
+             row.names = FALSE,
+             format = "html", table.attr = 'class="myTable"',
+             caption = "__Tab.3 Example of geographical codes and associated labels__")
+```
+
+
+
+## 2. How to generate the Epidemiological Report in Microsoft Word format
+
+To generate a similar report to the Annual Epidemiological Report, we can use the default dataset 
+included in the `EpiReport` package presenting Salmonellosis data 2012-2016.
+
+Calling the function `getAER()`, the Salmonellosis 2016 report will be generated 
+and stored in your working directory (see `getwd()`) by default.
+
+```{r, eval=FALSE}
+getAER()
+```
+
+Please specify the full path to the output folder if necessary:
+
+```{r, eval=FALSE}
+output <- "C:/EpiReport/doc/"
+getAER(outputPath = output)
+```
+
+
+
+### 2.1. External disease dataset
+
+To generate the report using an external dataset, please use the syntax below.
+
+In the following example, Pertussis 2016 TESSy data (in csv format, in the `/data` 
+folder) is used to produce the corresponding report.
+
+Pertussis PNG maps have previously been created and stored in a specific folder `/maps`. 
+
+```{r, warning=FALSE}
+# --- Importing the dataset
+PERT2016 <- read.table("data/PERT2016.csv", 
+                       sep = ",", 
+                       header = TRUE, 
+                       stringsAsFactors = FALSE)
+
+# --- Specifying the folder containing pertussis maps
+pathMap <- paste(getwd(), "/maps", sep = "")
+
+
+# --- (optional) Setting the local language in English for month label
+Sys.setlocale("LC_TIME", "C")
+
+# --- Producing the report
+EpiReport::getAER(disease = "PERT", 
+       year = 2016, 
+       x = PERT2016, 
+       pathPNG = pathMap)
+```
+
+
+Please note that the font `Tahoma` is used in the plot axis and legend.
+It is advised to import this font using the `extrafont` package and the command
+`font_import` and `loadfonts`. 
+
+However, if the users prefer the use of the default `Arial` in plots, it is optional. 
+In that case, warnings will appear in the console for each plot.
+
+
+
+### 2.2. Word template
+
+By default, an empty ECDC template (Microsoft Word) is used to produce the report. 
+In order to modify this template, please first download the default template 
+using the function `getTemplate()`.
+
+You can store this Microsoft Word template in a specific folder `/template`.
+
+```{r, eval = FALSE}
+getTemplate(output_path = "C:/EpiReport/template")
+```
+
+Then, apply the modifications required, save it and use it as a new Microsoft
+Word template when producing the epidemiological report as described below.
+
+```{r, eval = FALSE}
+getAER(template = "C:/EpiReport/template/New_AER_Template.docx",
+       outputPath = "C:/EpiReport/doc/")
+```
+
+Please make sure that the Microsoft Word bookmarks are preserved throughout the 
+modifications to the template. The bookmarks specify the location where to include
+each output.
+
+
+
+## 3. How to generate each epidemiological outputs independently
+
+The `EpiReport` package allows the user to generate each epidemiological output 
+independently of the Microsoft Word report.
+
+The ECDC annual epidemiological Report includes five types of outputs:
+
+* __Table__: Distribution of cases by Member State over the last five years with:
+    + the number of cases only;
+    + the number of cases and the corresponding rate  per 100 000 population or
+    + the number of cases, the rate and the age-standardised rate  per 100 000 population.
+* __Seasonality plot__: Distribution of cases at EU/EEA level, by month,
+over the past five years.
+* __Trend plot__: Trend and number of cases at EU/EEA level, by month,
+over the past five years.
+* __Map__: Distribution of cases by Member State presenting either:
+    + the number of cases;
+    + the rates per 100 000 population;
+    + the age-standardised rates per 100 000 population.
+* __Age and gender bar graph__: Distribution of cases at EU/EEA level:
+    + by age and gender and using:
+        + the number of cases
+        + the rate
+        + the proportion of cases
+    + by age only and using the rate.
+
+
+
+### 3.1. Table: distribution of cases by Member State
+
+The function `getTableByMS()` generates a `flextable` object (see package
+`flextable`) presenting the number of cases by Member State over the last five years.
+
+By default, the function will use the internal Salmonellosis 2012-2016 data and
+present the number of confirmed cases and the corresponding rate for each year,
+with a focus on 2016 and age-standardised rates.
+
+```{r}
+EpiReport::getTableByMS()
+```
+
+<center> ___Table. Distribution of confirmed salmonellosis cases, EU/EEA, 2012-2016___ </center>
+
+
+This table can be drafted using external data, and specifying the disease code 
+and the year to use as reference in the report. 
+
+In the example below, we use Zika virus data. According to the report parameters,
+the table for this disease should present the number of reported cases 
+over the last five years and by Member State.
+
+
+```{r}
+ZIKV2016 <- read.table("data/ZIKV2016.csv", 
+                       sep = ",", 
+                       header = TRUE, 
+                       stringsAsFactors = FALSE)
+EpiReport::getTableByMS(x = ZIKV2016, 
+             disease = "ZIKV", 
+             year = 2016)
+```
+
+<center> ___Table. Distribution of Zika virus infection cases, EU/EEA, 2012-2016___ </center>
+
+
+
+### 3.2. Seasonality plot: distribution of cases by month
+
+The function `getSeason()` generates a ggplot (see package `ggplot2`) presenting 
+the distribution of cases at EU/EEA level, by month, over the past five years.
+
+The plot includes:
+
+* The number of cases by month in the reference year (green solid line)
+* The mean number of cases by month in the four previous years (grey dashed line)
+* The minimum number of cases by month in the four previous years (grey area)
+* The maximum number of cases by month in the four previous years (grey area)
+
+By default, the function will use the internal Salmonellosis 2012-2016 data.
+
+
+```{r, fig.width = 7}
+# --- Salmonellosis 2016 plot
+EpiReport::getSeason()
+```
+
+___Figure. Distribution of confirmed salmonellosis cases by month, EU/EEA, 2016 and 2012-2015___
+
+
+The plot can also be drafted using external data, and specifying the disease dataset,
+the disease code and the year to use as reference in the report.
+
+In the example below, we use Pertussis 2012-2016 data.
+
+
+```{r, fig.width = 7}
+# --- Pertussis 2016 plot
+EpiReport::getSeason(x = PERT2016,
+                     disease = "PERT",
+                     year = 2016)
+```
+
+___Figure. Distribution of pertussis cases by month, EU/EEA, 2016 and 2012-2015___
+
+
+### 3.3. Trend plot: trend and number of cases by month
+
+The function `getTrend()` generates a ggplot (see package `ggplot2`) presenting
+the trend and the number of cases at EU/EEA level, by month, over the past five years.
+
+The plot includes:
+
+* The number of cases by month over the 5-year period (grey solid line)
+* The 12-month moving average of the number of cases by month (green solid line)
+
+By default, the function will use the internal Salmonellosis 2012-2016 data.
+
+```{r, fig.width = 7}
+# --- Salmonellosis 2016 plot
+EpiReport::getTrend()
+```
+
+___Figure. Trend and number of confirmed salmonellosis cases, EU/EEA by month, 2012-2016___
+
+
+The plot can also be drafted using external data, and specifying the disease dataset,
+the disease code and the year to use as reference in the report.
+
+In the example below, we use again Pertussis 2012-2016 data.
+
+
+```{r, fig.width = 7}
+# --- Pertussis 2016 plot
+EpiReport::getTrend(x = PERT2016,
+                    disease = "PERT",
+                    year = 2016)
+```
+
+___Figure. Trend and number of pertussis cases, EU/EEA by month, 2012-2016___
+
+
+
+### 3.4. Maps: distribution of cases by Member State
+
+The function `getMap()` provides with a preview of the PNG map associated with the disease.
+
+By default, the function will use the internal Salmonellosis 2016 PNG maps.
+According to the report parameters, the corresponding map should present 
+the notification rate of confirmed salmonellosis cases.
+
+
+```{r, fig.width = 7, fig.height=5, fig.retina=4, results='hide'}
+# --- Salmonellosis 2016 map
+EpiReport::getMap()
+```
+
+___Figure. Distribution of confirmed salmonellosis cases per 100 000 population by country, EU/EEA, 2016___
+
+
+The map can also be included using external PNG files, and specifying 
+the disease code and the year to use as reference in the report. 
+The corresponding syntax is described below (pertussis map not available).
+
+```{r, eval = FALSE}
+# --- Pertussis 2016 map
+EpiReport::getMap(disease = "PERT", 
+                  year = 2016, 
+                  pathPNG = "C:/EpiReport/maps/")
+```
+
+
+
+### 3.5. Age and gender bar graph
+
+The function `getAgeGender()` generates a ggplot (see package `ggplot2`) 
+presenting in a bar graph the distribution of cases at EU/EEA level by age and gender.
+
+The bar graph uses either:
+
+* The number of cases,
+* The rate per 100 000 cases,
+* The proportion of cases.
+
+By default, the function will use the internal Salmonellosis 2012-2016 data with 
+the rate of confirmed cases per 100 000 population.
+
+
+```{r, fig.width = 7}
+# --- Salmonellosis 2016 bar graph
+EpiReport::getAgeGender()
+```
+
+___Figure. Distribution of confirmed salmonellosis cases per 100 000 population, by age and gender, EU/EEA, 2016___
+
+
+The bar graph can also be drafted using external data, and specifying the disease 
+dataset, the disease code and the year to use as reference in the report.
+
+In the example below, we use Zika 2012-2016 data.
+
+
+```{r, fig.width = 7}
+# --- Zika 2016 bar graph
+EpiReport::getAgeGender(x = ZIKV2016, 
+                        disease = "ZIKV", 
+                        year = 2016)
+```
+
+___Figure. Distribution of Zika virus infection proportion (%), by age and gender, EU/EEA, 2016___
