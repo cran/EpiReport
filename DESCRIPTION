@@ -1,8 +1,8 @@
 Package: EpiReport
 Type: Package
 Title: Epidemiological Report
-Version: 0.1.0
-Date: 2018-10-31
+Version: 0.1.1
+Date: 2020-05-11
 Authors@R: c( 
   person( given = "Lore", family = "Merdrignac", 
           role = c("aut", "ctr", "cre"), email = "l.merdrignac@epiconcept.fr", comment = "Author of the package and original code"),
@@ -29,13 +29,13 @@ Depends: R (>= 3.4.0)
 License: EUPL
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 6.1.0
+RoxygenNote: 7.1.0
 Imports: officer, flextable, zoo, png, dplyr, tidyr, ggplot2,
         extrafont, graphics, utils, knitr (>= 1.20), rmarkdown
 VignetteBuilder: knitr
 URL: https://ecdc.europa.eu/en/annual-epidemiological-reports
 NeedsCompilation: no
-Packaged: 2018-11-05 10:27:12 UTC; LMC
+Packaged: 2020-05-11 12:53:46 UTC; LMC
 Author: Lore Merdrignac [aut, ctr, cre] (Author of the package and original
     code),
   Tommi Karki [aut, fnd],
@@ -43,4 +43,4 @@ Author: Lore Merdrignac [aut, ctr, cre] (Author of the package and original
   Joana Gomes Dias [aut, fnd] (Project manager)
 Maintainer: Lore Merdrignac <l.merdrignac@epiconcept.fr>
 Repository: CRAN
-Date/Publication: 2018-11-14 11:10:16 UTC
+Date/Publication: 2020-05-11 16:00:07 UTC
