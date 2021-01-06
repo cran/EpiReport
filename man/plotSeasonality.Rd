@@ -5,7 +5,7 @@
 \title{Seasonality line graph}
 \usage{
 plotSeasonality(
-  data,
+  .data,
   xvar = "TimeCode",
   yvar = "N",
   min4years = "Min4Years",
@@ -15,7 +15,7 @@ plotSeasonality(
 )
 }
 \arguments{
-\item{data}{dataframe containing the variables to plot}
+\item{.data}{dataframe containing the variables to plot}
 
 \item{xvar}{character string, name of the time variable on the x-axis in quotes
 (default \code{"TimeCode"})}
@@ -45,6 +45,34 @@ The graph includes the distribution of cases, by month, over the past five years
    \item{\code{max4years}: }{The maximum number of cases by month in the four previous years (grey area)}
 }
 Expects aggregated data and pre-calculated min, max and mean figures.
+}
+\examples{
+
+
+# --- Plot using external dataset
+
+# Create a dummy dataset
+test <- data.frame(Time = as.Date(paste0("2019-",c(1:12), "-01")),
+                   N = sample(c(5000:7000), 12),
+                   mean = sample(c(4000:5000), 12),
+                   low = sample(c(3000:4000), 12),
+                   high = sample(c(5000:6000), 12))
+
+# Plot the dummy data
+plotSeasonality(test,
+                xvar = "Time",
+                yvar = "N",
+                min4years = "low",
+                max4years = "high",
+                mean4years = "mean",
+                year = 2019)
+
+# --- Please see examples in the vignette
+browseVignettes(package = "EpiReport")
+
+# --- Plot using the default dataset
+getSeason()
+
 }
 \seealso{
 Global function: \code{\link{getSeason}}  \cr

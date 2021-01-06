@@ -4,10 +4,10 @@
 \alias{plotTS12MAvg}
 \title{Time series with 12-month moving average}
 \usage{
-plotTS12MAvg(data, xvar = "TimeCode", yvar = "N", movAverage = "MAV")
+plotTS12MAvg(.data, xvar = "TimeCode", yvar = "N", movAverage = "MAV")
 }
 \arguments{
-\item{data}{dataframe containing the variables to plot}
+\item{.data}{dataframe containing the variables to plot}
 
 \item{xvar}{character string, name of the time variable to plot on the x-axis
 in quotes (default \code{"TimeCode"})}
@@ -28,6 +28,22 @@ over the past five years, with:
    \item{\code{movAverage}: }{The 12-month moving average of the number of cases by month (green solid line)}
 }
 Expects aggregated data and pre-calculated 12-month moving average.
+}
+\examples{
+
+# --- Plot using external dataset
+
+# Create a dummy dataset
+test <- data.frame(Time = as.Date(paste0("2019-",c(1:12), "-01")),
+                   N = sample(c(4000:6000), 12),
+                   mean = sample(c(4000:5000), 12))
+
+# Plot the dummy data
+plotTS12MAvg(test,
+             xvar = "Time",
+             yvar = "N",
+             movAverage = "mean")
+
 }
 \seealso{
 Global function: \code{\link{getTrend}}  \cr
