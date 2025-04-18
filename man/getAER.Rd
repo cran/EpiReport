@@ -5,8 +5,7 @@
 \title{Get full disease-specific epidemiological report}
 \usage{
 getAER(
-  template = file.path(system.file(package = "EpiReport"),
-    "template/AER_template.docx"),
+  template = file.path(system.file(package = "EpiReport"), "template/AER_template.docx"),
   outputPath = getwd(),
   x = EpiReport::DENGUE2019,
   disease = "DENGUE",
@@ -56,7 +55,7 @@ Function to generate the 'Microsoft Word' epidemiological report
 including all disease-specific outputs at each output-specific bookmarks exact location. \cr
 (for further information on the outputs and the corresponding bookmarks,
 please see the package vignette "The Epidemiological Report Package" with \code{browseVignettes("EpiReport")})\cr
-(see ECDC AER \url{https://www.ecdc.europa.eu/en/all-topics-z/surveillance-and-disease-data/annual-epidemiological-reports-aers})
+(see ECDC AER \url{https://www.ecdc.europa.eu/en/publications-data/monitoring/all-annual-epidemiological-reports})
 }
 \examples{
 
