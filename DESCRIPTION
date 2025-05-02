@@ -1,7 +1,7 @@
 Package: EpiReport
 Type: Package
 Title: Epidemiological Report
-Version: 1.0.3
+Version: 1.0.4
 Date: 2025-04-18
 Authors@R: c( 
   person( given = "Lore", family = "Merdrignac", 
@@ -36,8 +36,9 @@ Suggests: knitr (>= 1.20), rmarkdown
 VignetteBuilder: knitr
 URL:
         https://www.ecdc.europa.eu/en/publications-data/monitoring/all-annual-epidemiological-reports
+        https://epiconcept-paris.github.io/EpiReport/
 NeedsCompilation: no
-Packaged: 2025-04-18 14:47:28 UTC; l.merdrignac
+Packaged: 2025-05-02 08:58:20 UTC; l.merdrignac
 Author: Lore Merdrignac [aut, ctr, cre] (Author of the package and original
     code),
   Tommi Karki [aut, fnd],
@@ -45,4 +46,4 @@ Author: Lore Merdrignac [aut, ctr, cre] (Author of the package and original
   Joana Gomes Dias [aut, fnd] (Project manager)
 Maintainer: Lore Merdrignac <l.merdrignac@epiconcept.fr>
 Repository: CRAN
-Date/Publication: 2025-04-18 15:20:02 UTC
+Date/Publication: 2025-05-02 09:30:12 UTC

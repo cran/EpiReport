@@ -1,5 +1,6 @@
-0077c3b24535e1c5252f9dee8dca00cb *DESCRIPTION
+97cbff0de362deb8657ec1f7b301b437 *DESCRIPTION
 a6e43227a8c98200d9783dfad45eac43 *NAMESPACE
+05322b382dcfdff8d46392324134de2f *NEWS.md
 80b25ef23f17b3b02c12b96797830336 *R/AER_age_gender_bar.R
 73c8f7a5880c898027a3ea8b901a11e5 *R/AER_maps.R
 e1f3679f0a485c19e7cf1b66cd7956fc *R/AER_report.R
@@ -16,16 +17,15 @@ f313315a7a5603b7918cc1700fb9cf3f *R/order_quasinum.R
 fc466d285f3b380ebd2c870708e02ca8 *R/plotPie.R
 c062855eeb1fc43d5e3de25294896341 *R/plotTS.R
 8daf5a5231af466ac3187be1db3970dd *R/plotTSGrouped.R
-2ed3f60b63bda1cba433d2841c573264 *README.md
+55cecbdccda0b414760010d52783516f *README.md
 37226702fdd73a5f9bafc8a82371c891 *build/vignette.rds
 3e4b3861ec3b49c900f1d8db3a07cd90 *data/AERparams.RData
 0be0b53ad26a2207f694a9b980d8575e *data/DENGUE2019.RData
 3cb13f7a18b8af9da040177fe19cf74c *data/MSCode.RData
 bfb1b90fdf9ff65bc4edb1b0e175e670 *data/SALM2016.RData
-af5905481239c89de4be07dae184d645 *inst/NEWS.md
 d6b714ca7ea8cf0e4eac5aa01c91acd2 *inst/doc/EpiReport_Vignette.R
 c4702ee7816a06991b643e503e911f46 *inst/doc/EpiReport_Vignette.Rmd
-0bf6c757b95201c981804029e3c41b74 *inst/doc/EpiReport_Vignette.html
+be5965c05f96e9b045af2801edd74d77 *inst/doc/EpiReport_Vignette.html
 c8cc214f9a92b50d2a98096c5c6dcf25 *inst/maps/DENGUE_2019.ALL.COUNT.png
 41f6e25bf051ee38db13d0e4f8dc9acc *inst/maps/SALM_2016.CONFIRMED.RATE.png
 601384a2919ebfe366abf998f92cb863 *inst/template/AER_template.docx
